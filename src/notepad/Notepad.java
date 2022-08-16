@@ -12,12 +12,20 @@ import java.lang.reflect.Array;
 import java.util.Locale;
 import javax.swing.text.StyleConstants;
 import java.awt.event.*;
+import java.io.BufferedWriter;
+import javafx.stage.FileChooser;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
  *
  * @author Anuj
  */
 public class Notepad implements ActionListener{
+    JFrame f;
      JTextArea t;
     public Notepad() {
         // Main frame
@@ -165,12 +173,54 @@ public class Notepad implements ActionListener{
              
           }
 //          else if(e.getActionCommand().equalsIgnoreCase("Open")){
+//              JFileChooser jf=new JFileChooser();
+//              int option = jf.showOpenDialog(f);
+//              if(option==JFileChooser.APPROVE_OPTION){
+//                  File file=jf.getSelectedFile();
+//                  t.append(file);
+//              }
 //          
 //          }
-//          
-//           else if(e.getActionCommand().equalsIgnoreCase("Save")){
-//          
-//          }
+          
+           else if(e.getActionCommand().equalsIgnoreCase("Save")){
+               JFileChooser filechooser=new JFileChooser();
+               FileNameExtensionFilter textfilter = new FileNameExtensionFilter("only text files (.txt)", "txt");
+               filechooser.setAcceptAllFileFilterUsed(false);
+               filechooser.addChoosableFileFilter(textfilter);
+             int action = filechooser.showSaveDialog(null);
+             
+             if(action!=JFileChooser.APPROVE_OPTION){
+             return ;
+             }
+             
+             else {
+                 String filename=filechooser.getSelectedFile().getAbsolutePath().toString();
+                 if(filename.contains(".txt")){
+                 filename+=".txt";
+                  
+                 try{
+                 BufferedWriter writer = new BufferedWriter(new FileWriter(filename));
+                 t.write(writer);
+                 }
+                 
+                 catch(IOException ex){
+                     ex.printStackTrace();
+                 }
+                 
+                 
+                 
+                 
+                 }
+             }
+             
+             
+             
+             
+             
+               
+               
+               
+          }
 //           else if(e.getActionCommand().equalsIgnoreCase("Print")){
 //          
 //          }
