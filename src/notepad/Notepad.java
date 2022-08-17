@@ -12,11 +12,16 @@ import java.lang.reflect.Array;
 import java.util.Locale;
 import javax.swing.text.StyleConstants;
 import java.awt.event.*;
+import java.awt.print.PrinterException;
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import javafx.stage.FileChooser;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -24,9 +29,12 @@ import javax.swing.filechooser.FileNameExtensionFilter;
  *
  * @author Anuj
  */
-public class Notepad implements ActionListener{
+public class Notepad implements ActionListener {
+
     JFrame f;
-     JTextArea t;
+    JTextArea t;
+    JFrame frameAction;
+
     public Notepad() {
         // Main frame
         JFrame f = new JFrame("Notepad");
@@ -38,7 +46,7 @@ public class Notepad implements ActionListener{
         f.setBounds(100, 100, 800, 600);
 
         // for text area
-        t=new JTextArea();
+        t = new JTextArea();
         t.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 18));
 
         // for menu bar
@@ -142,131 +150,100 @@ public class Notepad implements ActionListener{
         copy.addActionListener(this);
         paste.addActionListener(this);
         selectall.addActionListener(this);
-        about.addActionListener(this);
+
+        // adding shortcut keys
+        newfile.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, KeyEvent.CTRL_DOWN_MASK));
+        openfile.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.CTRL_DOWN_MASK));
+        savefile.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK));
+        printfile.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, KeyEvent.CTRL_DOWN_MASK));
+        exitfile.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, KeyEvent.CTRL_DOWN_MASK));
+        cut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, KeyEvent.CTRL_DOWN_MASK));
+        copy.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, KeyEvent.CTRL_DOWN_MASK));
+        paste.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, KeyEvent.CTRL_DOWN_MASK));
+        selectall.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, KeyEvent.CTRL_DOWN_MASK));
 
         // for making frame visible
         f.setVisible(true);
-        
-    }
-    
 
-   
-    
-    
-    
-    
-    
-    
-       
+    }
+
     public static void main(String[] args) {
-        
-        
+
         // default constructor
-        Notepad n=new Notepad();
+        Notepad n = new Notepad();
 
     }
 
-     public  void actionPerformed(ActionEvent e) {
-          if(e.getActionCommand().equalsIgnoreCase("New")){
-             
-             t.setText(null);
-             
-          }
-//          else if(e.getActionCommand().equalsIgnoreCase("Open")){
-//              JFileChooser jf=new JFileChooser();
-//              int option = jf.showOpenDialog(f);
-//              if(option==JFileChooser.APPROVE_OPTION){
-//                  File file=jf.getSelectedFile();
-//                  t.append(file);
-//              }
-//          
-//          }
-          
-           else if(e.getActionCommand().equalsIgnoreCase("Save")){
-               JFileChooser filechooser=new JFileChooser();
-               FileNameExtensionFilter textfilter = new FileNameExtensionFilter("only text files (.txt)", "txt");
-               filechooser.setAcceptAllFileFilterUsed(false);
-               filechooser.addChoosableFileFilter(textfilter);
-             int action = filechooser.showSaveDialog(null);
-             
-             if(action!=JFileChooser.APPROVE_OPTION){
-             return ;
-             }
-             
-             else {
-                 String filename=filechooser.getSelectedFile().getAbsolutePath().toString();
-                 if(filename.contains(".txt")){
-                 filename+=".txt";
-                  
-                 try{
-                 BufferedWriter writer = new BufferedWriter(new FileWriter(filename));
-                 t.write(writer);
-                 }
-                 
-                 catch(IOException ex){
-                     ex.printStackTrace();
-                 }
-                 
-                 
-                 
-                 
-                 }
-             }
-             
-             
-             
-             
-             
-               
-               
-               
-          }
-//           else if(e.getActionCommand().equalsIgnoreCase("Print")){
-//          
-//          }
-//           else if(e.getActionCommand().equalsIgnoreCase("Exit")){
-//          
-//          }
-//           else if(e.getActionCommand().equalsIgnoreCase("Cut")){
-//          
-//          }
-//           else if(e.getActionCommand().equalsIgnoreCase("Copy")){
-//          
-//          }
-//           else if(e.getActionCommand().equalsIgnoreCase("Paste")){
-//          
-//          }
-//           else if(e.getActionCommand().equalsIgnoreCase("Select All")){
-//          
-//          }
-//          
-//           else if(e.getActionCommand().equalsIgnoreCase("About")){
-//          
-//          } 
-//          
+    public void actionPerformed(ActionEvent e) {
+        if (e.getActionCommand().equalsIgnoreCase("New")) {
+
+            t.setText(null);
+
+        } else if (e.getActionCommand().equalsIgnoreCase("Open")) {
+            JFileChooser filechooser = new JFileChooser();
+            FileNameExtensionFilter textfilter = new FileNameExtensionFilter("only text files (.txt)", "txt");
+            filechooser.setAcceptAllFileFilterUsed(false);
+            filechooser.addChoosableFileFilter(textfilter);
+            int action = filechooser.showOpenDialog(null);
+            if (action != JFileChooser.APPROVE_OPTION) {
+                return;
+            } else {
+                try {
+
+                    BufferedReader reader = new BufferedReader(new FileReader(filechooser.getSelectedFile()));
+                    t.read(reader, null);
+
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+
+            }
+
+        } else if (e.getActionCommand().equalsIgnoreCase("Save")) {
+            JFileChooser filechooser = new JFileChooser();
+            FileNameExtensionFilter textfilter = new FileNameExtensionFilter("only text files (.txt)", "txt");
+            filechooser.setAcceptAllFileFilterUsed(false);
+            filechooser.addChoosableFileFilter(textfilter);
+            int action = filechooser.showSaveDialog(null);
+
+            if (action != JFileChooser.APPROVE_OPTION) {
+                return;
+            } else {
+                String filename = filechooser.getSelectedFile().getAbsolutePath().toString();
+                if (!filename.contains(".txt")) {
+                    filename += ".txt";
+                }
+
+                try {
+                    BufferedWriter writer = new BufferedWriter(new FileWriter(filename));
+                    t.write(writer);
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+
+            }
+        } else if (e.getActionCommand().equalsIgnoreCase("Print")) {
+
+            try {
+                t.print();
+            } catch (PrinterException ex) {
+                Logger.getLogger(Notepad.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } else if (e.getActionCommand().equalsIgnoreCase("Exit")) {
+
+            System.exit(0);
+
+        } else if (e.getActionCommand().equalsIgnoreCase("Cut")) {
+            t.cut();
+
+        } else if (e.getActionCommand().equalsIgnoreCase("Copy")) {
+            t.copy();
+        } else if (e.getActionCommand().equalsIgnoreCase("Paste")) {
+            t.paste();
+        } else if (e.getActionCommand().equalsIgnoreCase("Select All")) {
+            t.selectAll();
+        }
+
     }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
 
 }
